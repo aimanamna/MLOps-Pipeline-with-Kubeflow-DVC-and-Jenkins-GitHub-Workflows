@@ -1,0 +1,48 @@
+// Jenkinsfile (Declarative)
+pipeline {
+  agent any
+
+  environment {
+    PYTHONUNBUFFERED = '1'
+  }
+
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+
+    stage('Setup Python') {
+      steps {
+        sh 'python3 -m venv .venv && . .venv/bin/activate && pip install --upgrade pip'
+        sh '. .venv/bin/activate && pip install -r requirements.txt'
+      }
+    }
+
+    stage('DVC Status (optional)') {
+      steps {
+        sh '. .venv/bin/activate && dvc status || true'
+      }
+    }
+
+    stage('Compile Pipeline') {
+      steps {
+        sh '. .venv/bin/activate && python -m pip install kfp && python pipeline.py'
+      }
+    }
+
+    stage('Unit Tests') {
+      steps {
+        // Put any small tests here; for now just list components
+        sh 'ls -la components || true'
+      }
+    }
+  }
+
+  post {
+    always {
+      archiveArtifacts artifacts: 'pipeline.yaml, components/*.yaml', allowEmptyArchive: true
+    }
+  }
+}

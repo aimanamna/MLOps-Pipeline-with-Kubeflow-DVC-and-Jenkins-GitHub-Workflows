@@ -1,0 +1,10 @@
+kfp==2.2.0
+dvc==2.25.0
+scikit-learn>=1.2.0
+pandas
+numpy
+joblib
+pyyaml
+cloudpickle
+google-api-python-client  # optional if using Google Drive remote
+boto3                    # optional if using S3 remote
